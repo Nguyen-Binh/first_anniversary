@@ -173,8 +173,8 @@
     Làm người yêu anh nhé ❤️? 
   </div>
   <div id="popup-buttons">
-    <button onclick="onAccept()" style="font-size: 24px; padding: 15px 30px; margin: 0 20px; border-radius: 10px; border: none; background-color: #ff69b4; color: white; cursor: pointer;">Đồng ý 💖</button>
-    <button onclick="onDecline()" style="font-size: 24px; padding: 15px 30px; margin: 0 20px; border-radius: 10px; border: none; background-color: #aaa; color: white; cursor: pointer;">Không đồng ý 😢</button>
+    <button onclick="onAccept()" style="font-size: 36px; padding: 15px 30px; margin: 0 20px; border-radius: 10px; border: none; background-color: #ff69b4; color: white; cursor: pointer;">Đồng ý 💖</button>
+    <button onclick="onDecline()" style="font-size: 36px; padding: 15px 30px; margin: 0 20px; border-radius: 10px; border: none; background-color: #aaa; color: white; cursor: pointer;">Không đồng ý 😢</button>
   </div>
 </div>
 
@@ -489,7 +489,7 @@ function hidePopup() {
 }
 
 // Lắng nghe click 3 lần nhanh để hiện popup
-document.body.addEventListener('click', () => {
+function handleQuickClick() {
   if (!canTriggerExplosion) return;
 
   const now = Date.now();
@@ -504,7 +504,11 @@ document.body.addEventListener('click', () => {
     showLovePopup();
     clickCount = 0;
   }
-});
+}
+
+document.body.addEventListener('click', handleQuickClick);
+document.body.addEventListener('touchstart', handleQuickClick);
+
 
   </script>
 </body>
