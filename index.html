@@ -169,8 +169,8 @@
   z-index: 1000;
   font-family: 'Segoe UI', sans-serif;
   text-align: center;">
-  <div id="popup-question" style="font-size: 32px; margin-bottom: 30px;">
-    Em đồng ý làm người yêu anh nhé? 💌
+  <div id="popup-question" style="font-size: 40px; margin-bottom: 30px;">
+    Làm người yêu anh nhé ❤️? 
   </div>
   <div id="popup-buttons">
     <button onclick="onAccept()" style="font-size: 24px; padding: 15px 30px; margin: 0 20px; border-radius: 10px; border: none; background-color: #ff69b4; color: white; cursor: pointer;">Đồng ý 💖</button>
@@ -462,10 +462,10 @@ function showLovePopup() {
 function onAccept() {
   const popup = document.getElementById('love-popup');
   popup.innerHTML = `
-    <div style="font-size: 32px; text-align: center; margin-bottom: 30px;">
+    <div style="font-size: 40px; text-align: center; margin-bottom: 30px;">
       Anh biết mà 💘<br><br>Cảm ơn em yêu 😘
     </div>
-    <button onclick="hidePopup()" style="font-size: 22px; padding: 12px 25px; border-radius: 10px; border: none; background-color: #ff69b4; color: white; cursor: pointer;">
+    <button onclick="hidePopup()" style="font-size: 40px; padding: 12px 25px; border-radius: 10px; border: none; background-color: #ff69b4; color: white; cursor: pointer;">
       Em cũng yêu anh ❤️
     </button>`;
 }
@@ -473,10 +473,10 @@ function onAccept() {
 function onDecline() {
   const popup = document.getElementById('love-popup');
   popup.innerHTML = `
-    <div style="font-size: 32px; text-align: center; margin-bottom: 30px;">
+    <div style="font-size: 40px; text-align: center; margin-bottom: 30px;">
       Từ chối thất bại ❌<br><br>Em không chạy thoát được đâu, em yêu 😈❤️
     </div>
-    <button onclick="hidePopup()" style="font-size: 22px; padding: 12px 25px; border-radius: 10px; border: none; background-color: #ff69b4; color: white; cursor: pointer;">
+    <button onclick="hidePopup()" style="font-size:40px; padding: 12px 25px; border-radius: 10px; border: none; background-color: #ff69b4; color: white; cursor: pointer;">
       Em cũng yêu anh ❤️
     </button>`;
 }
