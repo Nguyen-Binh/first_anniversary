@@ -155,6 +155,29 @@
     }
   </style>
 </head>
+
+<div id="love-popup" style="
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 1000;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;">
+  <div id="popup-question" style="font-size: 32px; margin-bottom: 30px;">
+    Em đồng ý làm người yêu anh nhé? 💌
+  </div>
+  <div id="popup-buttons">
+    <button onclick="onAccept()" style="font-size: 24px; padding: 15px 30px; margin: 0 20px; border-radius: 10px; border: none; background-color: #ff69b4; color: white; cursor: pointer;">Đồng ý 💖</button>
+    <button onclick="onDecline()" style="font-size: 24px; padding: 15px 30px; margin: 0 20px; border-radius: 10px; border: none; background-color: #aaa; color: white; cursor: pointer;">Không đồng ý 😢</button>
+  </div>
+</div>
+
 <body>
   <audio id="bg-music" loop>
     <source src="https://nguyen-binh.github.io/first_anniversary/Music.mp3" type="audio/mpeg">
@@ -429,6 +452,60 @@
     }
 
     renderHeart();
+let clickCount = 0;
+let lastClickTime = 0;
+
+function showLovePopup() {
+  document.getElementById('love-popup').style.display = 'flex';
+}
+
+function onAccept() {
+  const popup = document.getElementById('love-popup');
+  popup.innerHTML = `
+    <div style="font-size: 32px; text-align: center; margin-bottom: 30px;">
+      Anh biết mà 💘<br><br>Cảm ơn em yêu 😘
+    </div>
+    <button onclick="hidePopup()" style="font-size: 22px; padding: 12px 25px; border-radius: 10px; border: none; background-color: #ff69b4; color: white; cursor: pointer;">
+      Em cũng yêu anh ❤️
+    </button>`;
+}
+
+function onDecline() {
+  const popup = document.getElementById('love-popup');
+  popup.innerHTML = `
+    <div style="font-size: 32px; text-align: center; margin-bottom: 30px;">
+      Từ chối thất bại ❌<br><br>Em không chạy thoát được đâu, em yêu 😈❤️
+    </div>
+    <button onclick="hidePopup()" style="font-size: 22px; padding: 12px 25px; border-radius: 10px; border: none; background-color: #ff69b4; color: white; cursor: pointer;">
+      Em cũng yêu anh ❤️
+    </button>`;
+}
+
+function hidePopup() {
+  document.getElementById('love-popup').style.display = 'none';
+  triggerHeartExplosion(); // hiệu ứng nhỏ khi quay lại
+  const music = document.getElementById('bg-music');
+  if (music.paused) music.play(); // đảm bảo nhạc vẫn tiếp tục
+}
+
+// Lắng nghe click 3 lần nhanh để hiện popup
+document.body.addEventListener('click', () => {
+  if (!canTriggerExplosion) return;
+
+  const now = Date.now();
+  if (now - lastClickTime < 600) {
+    clickCount++;
+  } else {
+    clickCount = 1;
+  }
+  lastClickTime = now;
+
+  if (clickCount === 3) {
+    showLovePopup();
+    clickCount = 0;
+  }
+});
+
   </script>
 </body>
 </html>
