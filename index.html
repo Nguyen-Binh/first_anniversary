@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
   <title>Love you "Thu Trang"</title>
   <meta charset="UTF-8">
   <style>
@@ -511,5 +515,164 @@ document.body.addEventListener('touchstart', handleQuickClick);
 
 
   </script>
+<div id="secret-box" style="
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  padding: 30px;
+  background: #fff0f5;
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(255, 105, 180, 0.7);
+  z-index: 9999;
+  display: none;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+  color: #444;">
+  <div style="font-size: 35px; margin-bottom: 20px;">🔐 Lời nhắn bí mật 💌</div>
+
+  <textarea id="secret-message" rows="5" cols="50" placeholder="Nhập lời muốn nói..." style="padding:10px;font-size: 18px; border-radius:8px;"></textarea><br><br>
+  <input id="secret-key" type="text" placeholder="Mã khóa riêng (vd: trang94)" style="padding: 8px;font-size: 18px; width: 300px;"><br><br>
+  <input id="secret-password" type="password" placeholder="Mật khẩu để mã hóa/giải mã" style="padding: 8px;font-size: 18px; width: 300px;"><br><br>
+
+  <button onclick="secretSave()" style="padding: 10px 20px;font-size: 20px; border-radius: 8px; background-color: #ff69b4; color: white; border: none; cursor: pointer;">📤 Lưu lời nhắn</button>
+  <button onclick="secretLoad()" style="padding: 10px 20px;font-size: 20px; border-radius: 8px; background-color: #6c757d; color: white; border: none; cursor: pointer; margin-left: 10px;">📥 Đọc lại</button>
+  <button onclick="secretDelete()" style="padding: 10px 20px;font-size: 20px; border-radius: 8px; background-color: crimson; color: white; border: none; cursor: pointer; margin-left: 10px;">🗑 Xóa lời nhắn</button>
+
+  <div id="secret-result" style="margin-top: 30px; font-size: 20px; white-space: pre-line;"></div>
+
+  <button onclick="document.getElementById('secret-box').style.display='none'" style="
+    margin-top: 25px;
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    background-color: #aaa;
+    color: white;
+    cursor: pointer;">
+    Đóng lại
+  </button>
+</div>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDTz2x91D7OS-HdlQnPcR2ixcufBF34A2E",
+    authDomain: "love-message-7f235.firebaseapp.com",
+    databaseURL: "https://love-message-7f235-default-rtdb.firebaseio.com",
+    projectId: "love-message-7f235",
+    storageBucket: "love-message-7f235.appspot.com",
+    messagingSenderId: "872955445820",
+    appId: "1:872955445820:web:d376c6a53e71924f09b939"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const holdTarget = document.getElementById('center-image');
+  let holdTimer;
+  function startHoldingSecret() {
+    holdTimer = setTimeout(() => {
+      document.getElementById('secret-box').style.display = 'block';
+    }, 2000);
+  }
+  function cancelHolding() {
+    clearTimeout(holdTimer);
+  }
+
+holdTarget.addEventListener('pointerdown', () => {
+  holdTimer = setTimeout(() => {
+    document.getElementById('secret-box').style.display = 'block';
+  }, 2000);
+});
+
+holdTarget.addEventListener('pointerup', () => {
+  clearTimeout(holdTimer);
+});
+holdTarget.addEventListener('pointerleave', () => {
+  clearTimeout(holdTimer);
+});
+
+
+  function secretSave() {
+    const msg = document.getElementById('secret-message').value.trim();
+    const key = document.getElementById('secret-key').value.trim();
+    const pass = document.getElementById('secret-password').value.trim();
+    const result = document.getElementById('secret-result');
+    if (!msg || !key || !pass) return alert("Hãy nhập đủ nội dung, mã khóa và mật khẩu.");
+    if (msg.length > 1000) return alert("Lời nhắn quá dài, hãy rút gọn dưới 1000 ký tự.");
+
+    const timestamp = new Date().toLocaleString();
+    const formattedMsg = `🕒 [${timestamp}]\n${msg}`;
+    const ref = db.ref("messages/" + key);
+
+    ref.get().then(snapshot => {
+      let finalContent = formattedMsg;
+      if (snapshot.exists()) {
+        try {
+          const oldBytes = CryptoJS.AES.decrypt(snapshot.val().data, pass);
+          const oldText = oldBytes.toString(CryptoJS.enc.Utf8);
+          if (oldText) finalContent = oldText + "\n\n" + formattedMsg;
+        } catch {
+          return alert("⚠️ Sai mật khẩu hoặc không thể đọc nội dung cũ.");
+        }
+      }
+      const encrypted = CryptoJS.AES.encrypt(finalContent, pass).toString();
+      ref.set({ data: encrypted }).then(() => {
+        result.innerText = "✅ Đã lưu lời nhắn mới vào lịch sử.";
+        document.getElementById('secret-message').value = '';
+      });
+    });
+  }
+
+  function secretLoad() {
+    const key = document.getElementById('secret-key').value.trim();
+    const pass = document.getElementById('secret-password').value.trim();
+    const result = document.getElementById('secret-result');
+    if (!key || !pass) return alert("Nhập mã khóa và mật khẩu để đọc.");
+
+    db.ref("messages/" + key).get().then(snapshot => {
+      if (snapshot.exists()) {
+        try {
+          const bytes = CryptoJS.AES.decrypt(snapshot.val().data, pass);
+          const original = bytes.toString(CryptoJS.enc.Utf8);
+          if (!original) throw new Error();
+          result.innerText = "📖 Nội dung lời nhắn:\n\n" + original;
+        } catch {
+          result.innerText = "❌ Sai mật khẩu hoặc không giải mã được.";
+        }
+      } else {
+        result.innerText = "⚠️ Không tìm thấy lời nhắn với mã khóa này.";
+      }
+    });
+  }
+
+  function secretDelete() {
+    const key = document.getElementById('secret-key').value.trim();
+    const pass = document.getElementById('secret-password').value.trim();
+    const result = document.getElementById('secret-result');
+    if (!key || !pass) return alert("⚠️ Cần nhập mã khóa và mật khẩu để xóa.");
+
+    const ref = db.ref("messages/" + key);
+    ref.get().then(snapshot => {
+      if (snapshot.exists()) {
+        try {
+          const bytes = CryptoJS.AES.decrypt(snapshot.val().data, pass);
+          const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+          if (!decrypted) throw new Error();
+          if (confirm("⚠️ Bạn chắc chắn muốn xóa lời nhắn này không?")) {
+            ref.remove().then(() => {
+              result.innerText = "🗑 Đã xóa lời nhắn.";
+            });
+          }
+        } catch {
+          alert("❌ Sai mật khẩu. Không thể xóa.");
+        }
+      } else {
+        alert("⚠️ Không tìm thấy lời nhắn với mã khóa này.");
+      }
+    });
+  }
+</script>
+
 </body>
 </html>
