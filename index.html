@@ -568,30 +568,26 @@ document.body.addEventListener('touchstart', handleQuickClick);
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  const holdTarget = document.getElementById('center-image');
-  let holdTimer;
-  function startHoldingSecret() {
-    holdTimer = setTimeout(() => {
-      document.getElementById('secret-box').style.display = 'block';
-    }, 2000);
-  }
-  function cancelHolding() {
-    clearTimeout(holdTimer);
-  }
+let holdTimer;
+let isHolding = false;
 
-holdTarget.addEventListener('pointerdown', () => {
+document.body.addEventListener('pointerdown', () => {
+  isHolding = true;
   holdTimer = setTimeout(() => {
-    document.getElementById('secret-box').style.display = 'block';
-  }, 2000);
+    if (isHolding) {
+      document.getElementById('secret-box').style.display = 'block';
+    }
+  }, 2000); // 2 giây nhấn giữ
 });
 
-holdTarget.addEventListener('pointerup', () => {
+document.body.addEventListener('pointerup', () => {
   clearTimeout(holdTimer);
+  isHolding = false;
 });
-holdTarget.addEventListener('pointerleave', () => {
+document.body.addEventListener('pointerleave', () => {
   clearTimeout(holdTimer);
+  isHolding = false;
 });
-
 
   function secretSave() {
     const msg = document.getElementById('secret-message').value.trim();
